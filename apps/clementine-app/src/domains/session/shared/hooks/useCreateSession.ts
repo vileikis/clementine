@@ -92,6 +92,8 @@ export function useCreateSession() {
           emailSentAt: null,
           jobId: null,
           jobStatus: null,
+          jobErrorCode: null,
+          jobErrorMessage: null,
           mainSessionId: null,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),

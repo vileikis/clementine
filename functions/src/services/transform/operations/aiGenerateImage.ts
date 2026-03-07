@@ -8,6 +8,8 @@
  */
 import { defineString } from 'firebase-functions/params'
 import {
+  BlockedReason,
+  FinishReason,
   GenerateContentResponse,
   GoogleGenAI,
   Modality,
@@ -20,6 +22,7 @@ import * as fs from 'fs/promises'
 
 import type { MediaReference } from '@clementine/shared'
 import type { GenerationRequest, GeneratedImage } from '../types'
+import { AiTransformError } from '../../ai/providers/types'
 import { logMemoryUsage, retryWithBackoff } from '../helpers'
 import { storage } from '../../../infra/firebase-admin'
 import { getStoragePathFromMediaReference } from '../../../infra/storage'
@@ -229,12 +232,51 @@ async function buildContentParts(
 /**
  * Extract image buffer from Gemini API response
  */
+const SAFETY_BLOCK_REASONS: BlockedReason[] = [
+  BlockedReason.SAFETY,
+  BlockedReason.IMAGE_SAFETY,
+  BlockedReason.BLOCKLIST,
+  BlockedReason.PROHIBITED_CONTENT,
+]
+
+const SAFETY_FINISH_REASONS: FinishReason[] = [
+  FinishReason.SAFETY,
+  FinishReason.IMAGE_SAFETY,
+  FinishReason.BLOCKLIST,
+  FinishReason.PROHIBITED_CONTENT,
+]
+
 function extractImageFromResponse(response: GenerateContentResponse): Buffer {
+  // Check prompt-level blocking
+  const { blockReason, blockReasonMessage } = response.promptFeedback ?? {}
+  if (blockReason && SAFETY_BLOCK_REASONS.includes(blockReason)) {
+    const message = `Image generation blocked by safety filter: ${blockReason}${blockReasonMessage ? ` - ${blockReasonMessage}` : ''}`
+    const error = new AiTransformError(message, 'SAFETY_FILTERED')
+    error.metadata = {
+      blockReason,
+      ...(blockReasonMessage && { blockReasonMessage }),
+    }
+    throw error
+  }
+
   if (!response.candidates || response.candidates.length === 0) {
     throw new Error('No candidates in Gemini API response')
   }
 
   const candidate = response.candidates[0]
+
+  // Check candidate-level safety filtering
+  if (candidate?.finishReason && SAFETY_FINISH_REASONS.includes(candidate.finishReason)) {
+    const blockedRatings = candidate.safetyRatings?.filter((r) => r.blocked)
+    const message = `Image generation blocked by safety filter: finishReason=${candidate.finishReason}`
+    const error = new AiTransformError(message, 'SAFETY_FILTERED')
+    error.metadata = {
+      finishReason: candidate.finishReason,
+      ...(blockedRatings?.length && { safetyRatings: blockedRatings }),
+    }
+    throw error
+  }
+
   if (!candidate?.content?.parts) {
     throw new Error('No content parts in Gemini API response')
   }

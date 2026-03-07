@@ -17,9 +17,9 @@
 
 **Purpose**: Extend shared Zod schemas with new optional fields required by downstream phases
 
-- [ ] T001 [P] Add optional `details` field (`z.record(z.unknown()).nullable().default(null)`) to `jobErrorSchema` in `packages/shared/src/schemas/job/job.schema.ts`
-- [ ] T002 [P] Add optional `jobErrorCode` field (`z.string().nullable().default(null)`) to `sessionSchema` in `packages/shared/src/schemas/session/session.schema.ts`
-- [ ] T003 Build shared package to verify schema changes compile: `pnpm --filter @clementine/shared build`
+- [x] T001 [P] Add optional `details` field (`z.record(z.unknown()).nullable().default(null)`) to `jobErrorSchema` in `packages/shared/src/schemas/job/job.schema.ts`
+- [x] T002 [P] Add optional `jobErrorCode` field (`z.string().nullable().default(null)`) to `sessionSchema` in `packages/shared/src/schemas/session/session.schema.ts`
+- [x] T003 Build shared package to verify schema changes compile: `pnpm --filter @clementine/shared build`
 
 ---
 
@@ -29,9 +29,9 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 [P] Add `'SAFETY_FILTERED'` to `AiTransformErrorCode` type union and add optional `metadata?: Record<string, unknown>` property to `AiTransformError` class in `functions/src/services/ai/providers/types.ts`
-- [ ] T005 [P] Add `SAFETY_FILTERED: 'Content was blocked by safety filters.'` entry to `SANITIZED_ERROR_MESSAGES` and update `createSanitizedError` to accept an optional third parameter `details: Record<string, unknown> | null = null` that is included in the returned `JobError` object, in `functions/src/repositories/job.ts`
-- [ ] T006 [P] Extend `updateSessionJobStatus` to accept an optional `jobErrorCode?: string` parameter and write it to the session document alongside `jobStatus` when provided, in `functions/src/repositories/session.ts`
+- [x] T004 [P] Add `'SAFETY_FILTERED'` to `AiTransformErrorCode` type union and add optional `metadata?: Record<string, unknown>` property to `AiTransformError` class in `functions/src/services/ai/providers/types.ts`
+- [x] T005 [P] Add `SAFETY_FILTERED: 'Content was blocked by safety filters.'` entry to `SANITIZED_ERROR_MESSAGES` and update `createSanitizedError` to accept an optional third parameter `details: Record<string, unknown> | null = null` that is included in the returned `JobError` object, in `functions/src/repositories/job.ts`
+- [x] T006 [P] Extend `updateSessionJobStatus` to accept an optional `jobErrorCode?: string` parameter and write it to the session document alongside `jobStatus` when provided, in `functions/src/repositories/session.ts`
 
 **Checkpoint**: Foundation ready — error infrastructure supports all user stories
 
@@ -45,8 +45,8 @@
 
 ### Implementation for User Story 1
 
-- [ ] T007 [P] [US1] Update `extractVideoUri` in `functions/src/services/transform/operations/aiGenerateVideo.ts`: when `generatedVideos` is empty or missing, read `operation.response?.raiMediaFilteredCount` and `operation.response?.raiMediaFilteredReasons`. Throw an `AiTransformError` with code `'SAFETY_FILTERED'`, a descriptive message including the filter reasons, and set `metadata` to `{ raiMediaFilteredCount, raiMediaFilteredReasons }`. Fall back to a generic safety filter error if the metadata fields are unavailable.
-- [ ] T008 [P] [US1] Update `extractImageFromResponse` in `functions/src/services/transform/operations/aiGenerateImage.ts`: before throwing on empty candidates, check `response.promptFeedback?.blockReason` for safety-related values (SAFETY, IMAGE_SAFETY, BLOCKLIST, PROHIBITED_CONTENT). Also check `candidate.finishReason` for SAFETY/IMAGE_SAFETY values and `candidate.safetyRatings` for blocked categories. When safety filtering is detected, throw an `AiTransformError` with code `'SAFETY_FILTERED'`, a descriptive message, and set `metadata` with the available filter data (`blockReason`, `blockReasonMessage`, `finishReason`, blocked `safetyRatings`). If no safety indicators found, keep existing generic error behavior.
+- [x] T007 [P] [US1] Update `extractVideoUri` in `functions/src/services/transform/operations/aiGenerateVideo.ts`: when `generatedVideos` is empty or missing, read `operation.response?.raiMediaFilteredCount` and `operation.response?.raiMediaFilteredReasons`. Throw an `AiTransformError` with code `'SAFETY_FILTERED'`, a descriptive message including the filter reasons, and set `metadata` to `{ raiMediaFilteredCount, raiMediaFilteredReasons }`. Fall back to a generic safety filter error if the metadata fields are unavailable.
+- [x] T008 [P] [US1] Update `extractImageFromResponse` in `functions/src/services/transform/operations/aiGenerateImage.ts`: before throwing on empty candidates, check `response.promptFeedback?.blockReason` for safety-related values (SAFETY, IMAGE_SAFETY, BLOCKLIST, PROHIBITED_CONTENT). Also check `candidate.finishReason` for SAFETY/IMAGE_SAFETY values and `candidate.safetyRatings` for blocked categories. When safety filtering is detected, throw an `AiTransformError` with code `'SAFETY_FILTERED'`, a descriptive message, and set `metadata` with the available filter data (`blockReason`, `blockReasonMessage`, `finishReason`, blocked `safetyRatings`). If no safety indicators found, keep existing generic error behavior.
 
 **Checkpoint**: Safety filter reasons are captured in errors thrown by generation functions. Verify by reading Cloud Function logs after a filtered generation.
 
@@ -60,7 +60,7 @@
 
 ### Implementation for User Story 2
 
-- [ ] T009 [US2] Update `handleJobFailure` in `functions/src/tasks/transformPipelineTask.ts`: replace the hardcoded `createSanitizedError('PROCESSING_FAILED', 'outcome')` with error classification logic. Check `error instanceof AiTransformError` and map `error.code` to sanitized codes per the mapping: `SAFETY_FILTERED` → `SAFETY_FILTERED`, `API_ERROR` → `AI_MODEL_ERROR`, `TIMEOUT` → `TIMEOUT`, `INVALID_CONFIG`/`INVALID_INPUT_IMAGE`/`REFERENCE_IMAGE_NOT_FOUND` → `INVALID_INPUT`. For non-`AiTransformError` errors, also check for `OutcomeError` with code `INVALID_INPUT`. Default to `PROCESSING_FAILED` for unrecognized errors. Pass `error.metadata` (if `AiTransformError`) as the `details` parameter to `createSanitizedError`. Ensure full error logging (message + stack trace) is preserved.
+- [x] T009 [US2] Update `handleJobFailure` in `functions/src/tasks/transformPipelineTask.ts`: replace the hardcoded `createSanitizedError('PROCESSING_FAILED', 'outcome')` with error classification logic. Check `error instanceof AiTransformError` and map `error.code` to sanitized codes per the mapping: `SAFETY_FILTERED` → `SAFETY_FILTERED`, `API_ERROR` → `AI_MODEL_ERROR`, `TIMEOUT` → `TIMEOUT`, `INVALID_CONFIG`/`INVALID_INPUT_IMAGE`/`REFERENCE_IMAGE_NOT_FOUND` → `INVALID_INPUT`. For non-`AiTransformError` errors, also check for `OutcomeError` with code `INVALID_INPUT`. Default to `PROCESSING_FAILED` for unrecognized errors. Pass `error.metadata` (if `AiTransformError`) as the `details` parameter to `createSanitizedError`. Ensure full error logging (message + stack trace) is preserved.
 
 **Checkpoint**: Job documents contain specific error codes. Query Firestore for jobs with `error.code == 'SAFETY_FILTERED'` to verify classification works.
 
@@ -76,7 +76,7 @@
 
 ### Implementation for User Story 3
 
-- [ ] T010 [US3] Update the `updateSessionJobStatus` call in `handleJobFailure` in `functions/src/tasks/transformPipelineTask.ts` to pass the sanitized error code as the `jobErrorCode` parameter when the job status is `'failed'`. Also update the OOM recovery guard error path (restart-guard) to pass its error code similarly.
+- [x] T010 [US3] Update the `updateSessionJobStatus` call in `handleJobFailure` in `functions/src/tasks/transformPipelineTask.ts` to pass the sanitized error code as the `jobErrorCode` parameter when the job status is `'failed'`. Also update the OOM recovery guard error path (restart-guard) to pass its error code similarly.
 
 **Checkpoint**: Session documents contain `jobErrorCode` when job status is `'failed'`. Verify via Firestore console.
 
@@ -92,7 +92,7 @@
 
 ### Implementation for User Story 4
 
-- [ ] T011 [US4] Update error rendering in `apps/clementine-app/src/domains/guest/containers/SharePage.tsx`: read `session.jobErrorCode` from the session data. When `isJobFailed` is true, map the error code to differentiated title + message props passed to `ThemedErrorState`: `SAFETY_FILTERED` → title "Photo couldn't be processed", message "Your photo couldn't be processed because it didn't meet our content guidelines. Please try a different photo."; `TIMEOUT` → title "Processing timed out", message "Processing took longer than expected. Please try again."; default (including null/undefined) → current generic title "Something went wrong", message "We couldn't process your image. Please try again." Ensure no error codes, filter reasons, or technical details appear in the rendered output.
+- [x] T011 [US4] Update error rendering in `apps/clementine-app/src/domains/guest/containers/SharePage.tsx`: read `session.jobErrorCode` from the session data. When `isJobFailed` is true, map the error code to differentiated title + message props passed to `ThemedErrorState`: `SAFETY_FILTERED` → title "Photo couldn't be processed", message "Your photo couldn't be processed because it didn't meet our content guidelines. Please try a different photo."; `TIMEOUT` → title "Processing timed out", message "Processing took longer than expected. Please try again."; default (including null/undefined) → current generic title "Something went wrong", message "We couldn't process your image. Please try again." Ensure no error codes, filter reasons, or technical details appear in the rendered output.
 
 **Checkpoint**: Share page shows differentiated messages. Open browser dev tools → verify no internal data leaks in rendered HTML.
 
@@ -102,8 +102,8 @@
 
 **Purpose**: Verify all changes compile, lint cleanly, and work together across workspaces
 
-- [ ] T012 Build and type-check all workspaces: `pnpm --filter @clementine/shared build && pnpm functions:build && pnpm app:type-check`
-- [ ] T013 Run linting and formatting: `pnpm app:check`
+- [x] T012 Build and type-check all workspaces: `pnpm --filter @clementine/shared build && pnpm functions:build && pnpm app:type-check`
+- [x] T013 Run linting and formatting: `pnpm app:check`
 
 ---
 

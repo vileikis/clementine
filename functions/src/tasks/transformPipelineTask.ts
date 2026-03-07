@@ -19,9 +19,11 @@ import {
   updateJobProgress,
   updateJobComplete,
   updateJobError,
-  createSanitizedError,
+  createJobError,
+  SANITIZED_ERROR_MESSAGES,
 } from '../repositories/job'
 import type { Job, JobOutput } from '@clementine/shared'
+import { AiTransformError } from '../services/ai/providers/types'
 import { runOutcome, type OutcomeContext } from '../services/transform'
 import { logMemoryUsage } from '../services/transform/helpers'
 import { createTempDir, cleanupTempDir } from '../infra/temp-dir'
@@ -152,9 +154,16 @@ async function prepareJobExecution(data: unknown): Promise<JobHandlerContext> {
         jobId,
         attemptCount: job.attemptCount,
       })
-      const sanitizedError = createSanitizedError('PROCESSING_FAILED', 'restart-guard')
-      await updateJobError(projectId, jobId, sanitizedError)
-      await updateSessionJobStatus(projectId, sessionId, jobId, 'failed')
+      const jobError = createJobError({
+        code: 'PROCESSING_FAILED',
+        message: SANITIZED_ERROR_MESSAGES['PROCESSING_FAILED']!,
+        step: 'restart-guard',
+      })
+      await updateJobError(projectId, jobId, jobError)
+      await updateSessionJobStatus(projectId, sessionId, jobId, 'failed', {
+        code: jobError.code,
+        message: jobError.message,
+      })
       throw new Error(`Job ${jobId} exceeded max attempts (${job.attemptCount}), aborting`)
     }
 
@@ -285,6 +294,36 @@ async function finalizeJobSuccess(
 }
 
 /**
+ * Build a JobError from an error, preserving AiTransformError fields directly
+ */
+function buildJobError(error: unknown): JobError {
+  if (error instanceof AiTransformError) {
+    return createJobError({
+      code: error.code,
+      message: error.message,
+      step: 'outcome',
+      metadata: error.metadata,
+    })
+  }
+
+  // Check for OutcomeError (not exported, check by name)
+  if (error instanceof Error && error.name === 'OutcomeError') {
+    const outcomeCode = (error as Error & { code?: string }).code
+    return createJobError({
+      code: outcomeCode ?? 'PROCESSING_FAILED',
+      message: error.message,
+      step: 'outcome',
+    })
+  }
+
+  return createJobError({
+    code: 'PROCESSING_FAILED',
+    message: SANITIZED_ERROR_MESSAGES['PROCESSING_FAILED']!,
+    step: 'outcome',
+  })
+}
+
+/**
  * Handle job failure - update job and session to failed state
  */
 async function handleJobFailure(
@@ -304,14 +343,18 @@ async function handleJobFailure(
       return
     }
 
-    const sanitizedError = createSanitizedError('PROCESSING_FAILED', 'outcome')
-    await updateJobError(projectId, job.id, sanitizedError)
-    await updateSessionJobStatus(projectId, sessionId, job.id, 'failed')
+    const jobError = buildJobError(error)
+    await updateJobError(projectId, job.id, jobError)
+    await updateSessionJobStatus(projectId, sessionId, job.id, 'failed', {
+      code: jobError.code,
+      message: jobError.message,
+    })
 
     logger.error('[TransformJob] Error details', {
       jobId: job.id,
       sessionId,
       projectId,
+      errorCode: jobError.code,
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
     })

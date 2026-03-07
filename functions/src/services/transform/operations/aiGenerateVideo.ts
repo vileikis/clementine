@@ -38,6 +38,7 @@ import {
   getStoragePathFromMediaReference,
 } from '../../../infra/storage'
 import { getMediaDimensions } from '../../ffmpeg/probe'
+import { AiTransformError } from '../../ai/providers/types'
 import { logMemoryUsage, retryWithBackoff } from '../helpers'
 import { sleep } from '../helpers/sleep'
 
@@ -396,11 +397,24 @@ function extractVideoUri(
   }
 
   const response = operation.response
-  if (!response?.generatedVideos || response.generatedVideos.length === 0) {
-    throw new Error('Video was filtered by safety policy')
+  const generatedVideo = response?.generatedVideos?.[0]
+
+  if (!generatedVideo) {
+    const raiMediaFilteredCount = response?.raiMediaFilteredCount || 0
+    const raiMediaFilteredReasons = response?.raiMediaFilteredReasons || []
+
+    const reasons = raiMediaFilteredReasons?.join(', ') ?? 'unknown'
+    const message = `Video was filtered by safety policy: ${reasons}`
+
+    const error = new AiTransformError(message, 'SAFETY_FILTERED')
+    error.metadata = {
+      raiMediaFilteredCount,
+      raiMediaFilteredReasons,
+    }
+    throw error
   }
 
-  const videoUri = response.generatedVideos[0]?.video?.uri
+  const videoUri = generatedVideo.video?.uri
   if (!videoUri) {
     throw new Error('No video URI in generation response')
   }

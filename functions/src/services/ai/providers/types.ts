@@ -62,12 +62,15 @@ export type AiTransformErrorCode =
   | 'INVALID_CONFIG'            // Config validation failed
   | 'REFERENCE_IMAGE_NOT_FOUND' // Reference image missing
   | 'INVALID_INPUT_IMAGE'       // Input buffer corrupt/invalid
-  | 'TIMEOUT';                  // Transformation exceeded timeout
+  | 'TIMEOUT'                   // Transformation exceeded timeout
+  | 'SAFETY_FILTERED';          // Content blocked by safety filters
 
 /**
  * Typed error for AI transformation failures
  */
 export class AiTransformError extends Error {
+  metadata?: Record<string, unknown>;
+
   constructor(
     message: string,
     public code: AiTransformErrorCode,

@@ -7,8 +7,14 @@
  * Note: session-legacy.ts uses old path (/sessions/{id}) for legacy media pipeline
  */
 import { db } from '../infra/firebase-admin'
-import { sessionSchema, type Session, type JobStatus, type MediaReference } from '@clementine/shared'
+import {
+  sessionSchema,
+  type Session,
+  type JobStatus,
+  type MediaReference,
+} from '@clementine/shared'
 import { convertFirestoreDoc } from '../utils/firestore-utils'
+import { UpdateData } from 'firebase-admin/firestore'
 
 /**
  * Get the Firestore reference for a session document
@@ -30,7 +36,7 @@ function getSessionRef(projectId: string, sessionId: string) {
  */
 export async function fetchSession(
   projectId: string,
-  sessionId: string
+  sessionId: string,
 ): Promise<Session | null> {
   const doc = await getSessionRef(projectId, sessionId).get()
 
@@ -53,13 +59,21 @@ export async function updateSessionJobStatus(
   projectId: string,
   sessionId: string,
   jobId: string,
-  jobStatus: JobStatus
+  jobStatus: JobStatus,
+  jobError?: { code: string; message: string },
 ): Promise<void> {
-  await getSessionRef(projectId, sessionId).update({
+  const update: UpdateData<Session> = {
     jobId,
     jobStatus,
     updatedAt: Date.now(),
-  })
+  }
+
+  if (jobError) {
+    update.jobErrorCode = jobError.code
+    update.jobErrorMessage = jobError.message
+  }
+
+  await getSessionRef(projectId, sessionId).update(update)
 }
 
 /**
@@ -82,7 +96,7 @@ export function hasActiveJob(session: Session): boolean {
 export async function updateSessionGuestEmail(
   projectId: string,
   sessionId: string,
-  guestEmail: string
+  guestEmail: string,
 ): Promise<void> {
   await getSessionRef(projectId, sessionId).update({
     guestEmail,
@@ -98,7 +112,7 @@ export async function updateSessionGuestEmail(
  */
 export async function updateSessionEmailSentAt(
   projectId: string,
-  sessionId: string
+  sessionId: string,
 ): Promise<void> {
   await getSessionRef(projectId, sessionId).update({
     emailSentAt: Date.now(),
@@ -122,7 +136,7 @@ export async function updateSessionResultMedia(
   mediaMetadata?: {
     format: 'image' | 'gif' | 'video'
     thumbnailUrl: string | null
-  }
+  },
 ): Promise<void> {
   await getSessionRef(projectId, sessionId).update({
     resultMedia,
