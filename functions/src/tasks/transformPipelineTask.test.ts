@@ -10,7 +10,6 @@ import { describe, it, expect } from 'vitest'
 import { transformPipelineJobPayloadSchema as transformPipelineTaskPayloadSchema } from '../schemas/transform-pipeline.schema'
 import { buildJobError } from './transformPipelineTask'
 import { AiTransformError } from '../services/ai/providers/types'
-import { SANITIZED_ERROR_MESSAGES } from '../repositories/job'
 
 describe('transformPipelineTask payload schema', () => {
   it('validates a valid payload', () => {
@@ -234,55 +233,43 @@ describe('transformPipelineTask expected behavior', () => {
 })
 
 describe('buildJobError', () => {
-  it('maps AiTransformError with SAFETY_FILTERED to JobError with sanitized message + metadata', () => {
-    const aiError = new AiTransformError('blocked by safety', 'SAFETY_FILTERED')
+  it('preserves AiTransformError code, raw message, and metadata for job doc', () => {
+    const aiError = new AiTransformError('Image generation blocked: finishReason=SAFETY', 'SAFETY_FILTERED')
     aiError.metadata = { blockReason: 'SAFETY', finishReason: 'SAFETY' }
 
     const jobError = buildJobError(aiError)
 
     expect(jobError.code).toBe('SAFETY_FILTERED')
-    expect(jobError.message).toBe(SANITIZED_ERROR_MESSAGES['SAFETY_FILTERED'])
+    expect(jobError.message).toBe('Image generation blocked: finishReason=SAFETY')
     expect(jobError.step).toBe('outcome')
     expect(jobError.metadata).toEqual({ blockReason: 'SAFETY', finishReason: 'SAFETY' })
     expect(jobError.isRetryable).toBe(false)
     expect(jobError.timestamp).toBeGreaterThan(0)
   })
 
-  it('maps AiTransformError with unmapped code to PROCESSING_FAILED', () => {
-    const aiError = new AiTransformError('api failed', 'API_ERROR')
+  it('preserves AiTransformError code and raw message for API_ERROR', () => {
+    const aiError = new AiTransformError('Gemini API returned 503', 'API_ERROR')
 
     const jobError = buildJobError(aiError)
 
-    expect(jobError.code).toBe('PROCESSING_FAILED')
-    expect(jobError.message).toBe(SANITIZED_ERROR_MESSAGES['PROCESSING_FAILED'])
+    expect(jobError.code).toBe('API_ERROR')
+    expect(jobError.message).toBe('Gemini API returned 503')
     expect(jobError.step).toBe('outcome')
   })
 
-  it('maps OutcomeError with known code to sanitized JobError', () => {
-    const outcomeError = new Error('Outcome failed')
+  it('preserves OutcomeError code and raw message', () => {
+    const outcomeError = new Error('Missing capture step for photo')
     outcomeError.name = 'OutcomeError'
     ;(outcomeError as Error & { code?: string }).code = 'INVALID_INPUT'
 
     const jobError = buildJobError(outcomeError)
 
     expect(jobError.code).toBe('INVALID_INPUT')
-    expect(jobError.message).toBe(SANITIZED_ERROR_MESSAGES['INVALID_INPUT'])
+    expect(jobError.message).toBe('Missing capture step for photo')
     expect(jobError.step).toBe('outcome')
   })
 
-  it('maps OutcomeError with unknown code to PROCESSING_FAILED', () => {
-    const outcomeError = new Error('Outcome failed')
-    outcomeError.name = 'OutcomeError'
-    ;(outcomeError as Error & { code?: string }).code = 'SOME_UNKNOWN_CODE'
-
-    const jobError = buildJobError(outcomeError)
-
-    expect(jobError.code).toBe('PROCESSING_FAILED')
-    expect(jobError.message).toBe(SANITIZED_ERROR_MESSAGES['PROCESSING_FAILED'])
-    expect(jobError.step).toBe('outcome')
-  })
-
-  it('maps unknown Error to JobError with PROCESSING_FAILED + sanitized message', () => {
+  it('maps unknown Error to PROCESSING_FAILED with sanitized message', () => {
     const genericError = new Error('Something internal broke at line 42')
 
     const jobError = buildJobError(genericError)
@@ -292,7 +279,7 @@ describe('buildJobError', () => {
     expect(jobError.step).toBe('outcome')
   })
 
-  it('maps non-Error value to JobError with PROCESSING_FAILED', () => {
+  it('maps non-Error value to PROCESSING_FAILED', () => {
     const jobError = buildJobError('string error')
 
     expect(jobError.code).toBe('PROCESSING_FAILED')
