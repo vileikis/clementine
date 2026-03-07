@@ -155,6 +155,12 @@ export const sessionSchema = z.looseObject({
   /** Transform job status (synced from job document) */
   jobStatus: jobStatusSchema.nullable().default(null),
 
+  /** Error code from failed job (for frontend error message differentiation) */
+  jobErrorCode: z.string().nullable().default(null),
+
+  /** Error message from failed job (displayed to guests on share page) */
+  jobErrorMessage: z.string().nullable().default(null),
+
   /**
    * OWNERSHIP
    */

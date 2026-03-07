@@ -4,6 +4,7 @@
  * CRUD operations for Job documents in Firestore.
  * Path: /projects/{projectId}/jobs/{jobId}
  */
+import { UpdateData } from 'firebase-admin/firestore'
 import { db, FieldValue } from '../infra/firebase-admin'
 import {
   jobSchema,
@@ -22,11 +23,7 @@ import {
  * Get the Firestore reference for a job document
  */
 function getJobRef(projectId: string, jobId: string) {
-  return db
-    .collection('projects')
-    .doc(projectId)
-    .collection('jobs')
-    .doc(jobId)
+  return db.collection('projects').doc(projectId).collection('jobs').doc(jobId)
 }
 
 /**
@@ -45,7 +42,7 @@ function getJobsCollectionRef(projectId: string) {
  */
 export async function createJob(
   projectId: string,
-  data: Omit<Job, 'id'>
+  data: Omit<Job, 'id'>,
 ): Promise<string> {
   const docRef = getJobsCollectionRef(projectId).doc()
   const jobId = docRef.id
@@ -71,7 +68,7 @@ export async function createJob(
  */
 export async function fetchJob(
   projectId: string,
-  jobId: string
+  jobId: string,
 ): Promise<Job | null> {
   const doc = await getJobRef(projectId, jobId).get()
 
@@ -97,7 +94,7 @@ export async function fetchJob(
 export async function updateJobStatus(
   projectId: string,
   jobId: string,
-  status: JobStatus
+  status: JobStatus,
 ): Promise<void> {
   await getJobRef(projectId, jobId).update({
     status,
@@ -115,7 +112,7 @@ export async function updateJobStatus(
 export async function updateJobProgress(
   projectId: string,
   jobId: string,
-  progress: JobProgress
+  progress: JobProgress,
 ): Promise<void> {
   await getJobRef(projectId, jobId).update({
     progress,
@@ -133,7 +130,7 @@ export async function updateJobProgress(
 export async function updateJobOutput(
   projectId: string,
   jobId: string,
-  output: JobOutput
+  output: JobOutput,
 ): Promise<void> {
   await getJobRef(projectId, jobId).update({
     output,
@@ -153,20 +150,23 @@ export async function updateJobOutput(
 export async function updateJobComplete(
   projectId: string,
   jobId: string,
-  output: JobOutput
+  output: JobOutput,
 ): Promise<void> {
   const now = Date.now()
-  await getJobRef(projectId, jobId).update({
-    status: 'completed' as JobStatus,
+
+  const update: UpdateData<Job> = {
+    status: 'completed',
     progress: {
       currentStep: 'completed',
       percentage: 100,
       message: 'Complete',
-    } satisfies JobProgress,
+    },
     output,
     completedAt: now,
     updatedAt: now,
-  })
+  }
+
+  await getJobRef(projectId, jobId).update(update)
 }
 
 /**
@@ -179,9 +179,10 @@ export async function updateJobComplete(
 export async function updateJobError(
   projectId: string,
   jobId: string,
-  error: JobError
+  error: JobError,
 ): Promise<void> {
   const now = Date.now()
+
   await getJobRef(projectId, jobId).update({
     status: 'failed' as JobStatus,
     error,
@@ -202,10 +203,10 @@ export async function updateJobError(
 export async function updateJobStarted(
   projectId: string,
   jobId: string,
-  initialProgress?: JobProgress
+  initialProgress?: JobProgress,
 ): Promise<void> {
   const now = Date.now()
-  const update: Record<string, unknown> = {
+  const update: UpdateData<Job> = {
     status: 'running' as JobStatus,
     startedAt: now,
     updatedAt: now,
@@ -213,7 +214,7 @@ export async function updateJobStarted(
   }
 
   if (initialProgress) {
-    update['progress'] = initialProgress
+    update.progress = initialProgress
   }
 
   await getJobRef(projectId, jobId).update(update)
@@ -233,6 +234,7 @@ export const SANITIZED_ERROR_MESSAGES: Record<string, string> = {
   TIMEOUT: 'Processing took too long and was cancelled.',
   CANCELLED: 'The request was cancelled.',
   UNKNOWN: 'An unexpected error occurred.',
+  SAFETY_FILTERED: 'Content was blocked by safety filters.',
 }
 
 /**
@@ -244,17 +246,32 @@ export const SANITIZED_ERROR_MESSAGES: Record<string, string> = {
  */
 export function createSanitizedError(
   code: string,
-  step: string | null = null
+  step: string | null = null,
 ): JobError {
   const message =
-    SANITIZED_ERROR_MESSAGES[code] ?? SANITIZED_ERROR_MESSAGES['UNKNOWN'] ?? 'An unexpected error occurred.'
+    SANITIZED_ERROR_MESSAGES[code] ??
+    SANITIZED_ERROR_MESSAGES['UNKNOWN'] ??
+    'An unexpected error occurred.'
 
+  return createJobError({ code, message, step })
+}
+
+/**
+ * Create a JobError object with sensible defaults
+ */
+export function createJobError(params: {
+  code: string
+  message: string
+  step?: string | null
+  metadata?: Record<string, unknown> | null
+}): JobError {
   return {
-    code,
-    message,
-    step,
-    isRetryable: false, // All errors are non-retryable per spec D9
+    code: params.code,
+    message: params.message,
+    step: params.step ?? null,
+    isRetryable: false,
     timestamp: Date.now(),
+    metadata: params.metadata ?? null,
   }
 }
 
@@ -320,7 +337,8 @@ export function buildJobSnapshot(
   configSource: 'draft' | 'published',
   options?: BuildJobSnapshotOptions,
 ): JobSnapshot {
-  const config = configSource === 'draft' ? experience.draft : experience.published
+  const config =
+    configSource === 'draft' ? experience.draft : experience.published
 
   if (!config) {
     throw new Error('Experience config not found')

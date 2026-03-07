@@ -187,7 +187,10 @@ export function SharePage({ mainSessionId }: SharePageProps) {
         {!isSessionMissing && isJobFailed && (
           <ThemedErrorState
             title="Something went wrong"
-            message="We couldn't process your image. Please try again."
+            message={
+              session?.jobErrorMessage ??
+              "We couldn't process your request. Please try again."
+            }
             actionLabel="Start Over"
             onAction={handleStartOver}
           />

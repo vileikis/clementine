@@ -31,6 +31,8 @@ function createMockSession(overrides: Partial<Session> = {}): Session {
     mainSessionId: null,
     jobId: null,
     jobStatus: null,
+    jobErrorCode: null,
+    jobErrorMessage: null,
     createdBy: null,
     createdAt: now,
     updatedAt: now,

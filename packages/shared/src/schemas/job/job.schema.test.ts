@@ -82,6 +82,24 @@ describe('jobErrorSchema', () => {
     })
     expect(result.step).toBe('ai.imageGeneration')
   })
+
+  it('accepts error with metadata field (record of string→unknown)', () => {
+    const result = jobErrorSchema.parse({
+      ...validError,
+      metadata: { blockReason: 'SAFETY', count: 3, nested: { key: 'value' } },
+    })
+    expect(result.metadata).toEqual({ blockReason: 'SAFETY', count: 3, nested: { key: 'value' } })
+  })
+
+  it('defaults metadata to null when omitted', () => {
+    const result = jobErrorSchema.parse(validError)
+    expect(result.metadata).toBeNull()
+  })
+
+  it('rejects metadata when not a record (e.g. string, number)', () => {
+    expect(() => jobErrorSchema.parse({ ...validError, metadata: 'not-a-record' })).toThrow()
+    expect(() => jobErrorSchema.parse({ ...validError, metadata: 42 })).toThrow()
+  })
 })
 
 describe('jobOutputSchema', () => {

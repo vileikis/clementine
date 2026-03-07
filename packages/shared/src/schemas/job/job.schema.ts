@@ -44,6 +44,7 @@ export const jobErrorSchema = z.object({
   step: z.string().nullable().default(null),
   isRetryable: z.boolean(),
   timestamp: z.number().int().positive(),
+  metadata: z.record(z.string(), z.unknown()).nullable().default(null),
 })
 
 /**
